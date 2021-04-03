@@ -1,7 +1,9 @@
 module WinEncoding
     const cp950=include("cp950.jl")
-    const cp1252=include("cp1252b.jl")
+    const cp1252b=include("cp1252b.jl")
     const cp936=include("cp936.jl")
+    const cp932=include("cp932.jl")
+    const cp932b=include("cp932b.jl")
     const _x80=[0xc2,0x80]             # '\u80'
     const _x80_936=[0xe2,0x82,0xac]     # '\u20ac' '€'
     const _xff=[0xef, 0xa3, 0xb8]      # '\uf8f8'
@@ -59,6 +61,35 @@ module WinEncoding
         end
         @view(o[1:b-1]) |> String
     end
+    """
+    decode932(a::Vector{UInt8})
+    Convert an array of bytes a representing text in encoding cp932/sjis to a string.
+    fallback to '・';no invalid sequence error;non-blocking """
+    function decode932(ss::Vector{UInt8}) 
+        blength=length(ss)
+        o=zeros(UInt8,blength*2+1)
+        b=1
+        skip1=false
+        @inbounds for (i,c) in enumerate(ss)
+            skip1==true && (skip1=false;continue)
+            c<0x80 && (o[b]=c; b+=1;continue)
+            if (c == 0x80 || 0xa0 <= c <0xe0 || c > 0xef) 
+                let cc=cp932b[c-0x7f]; ccl=length(cc)
+                    copyto!(o,b,cc,1,ccl); b+=ccl;continue
+                end
+            end
+            i % 1_000_000 == 1 && yield()
+            skip1=true
+            hh=c-0x80
+            hh > 0x1f && (hh-=0x40)
+            ll= ((i1=i+1) <= blength ) ? ss[i1] : 0x00
+            cc= (ll < 0x40 || ll > 0xfc ) ? _invalid  : cp932[hh][ll-0x3f]
+            ccl=length(cc)
+            unsafe_copyto!(o,b,cc,1,ccl)
+            b+=ccl
+        end
+        @view(o[1:b-1]) |> String
+    end
     #internal use
     function _7bit(ss)
         for c in ss
@@ -90,7 +121,7 @@ module WinEncoding
                 b+=1
             else
                 b % 1_000_000 == 1 && yield()
-                cc=cp1252[c+1]
+                cc=cp1252b[c+1]
                 ccl=length(cc)
                 unsafe_copyto!(o,b,cc,1,ccl)
                 b+=ccl
