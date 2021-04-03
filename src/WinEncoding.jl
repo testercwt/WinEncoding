@@ -12,9 +12,10 @@ module WinEncoding
     export decode1252
 
     """
-    decode950(a::Vector{UInt8})
+        decode950(a::Vector{UInt8})
     Convert an array of bytes a representing text in encoding cp950 to a string.
-    fallback to big5-hkscs or '\ufffd';no invalid sequence error;non-blocking """
+    fallback to big5-hkscs or '\ufffd';no invalid sequence error;non-blocking
+    """
     function decode950(ss::Vector{UInt8}) 
         blength=length(ss)
         o=zeros(UInt8,blength*2+1)
@@ -37,9 +38,10 @@ module WinEncoding
         @view(o[1:b-1]) |> String
     end
     """
-    decode936(a::Vector{UInt8})
+        decode936(a::Vector{UInt8})
     Convert an array of bytes a representing text in encoding cp936/gbk to a string.
-    fallback to '\ufffd';no invalid sequence error;non-blocking """
+    fallback to '\ufffd';no invalid sequence error;non-blocking
+    """
     function decode936(ss::Vector{UInt8}) 
         blength=length(ss)
         o=zeros(UInt8,blength*2+1)
@@ -62,9 +64,10 @@ module WinEncoding
         @view(o[1:b-1]) |> String
     end
     """
-    decode932(a::Vector{UInt8})
+        decode932(a::Vector{UInt8})
     Convert an array of bytes a representing text in encoding cp932/sjis to a string.
-    fallback to '・';no invalid sequence error;non-blocking """
+    fallback to '・';no invalid sequence error;non-blocking
+    """
     function decode932(ss::Vector{UInt8}) 
         blength=length(ss)
         o=zeros(UInt8,blength*2+1)
@@ -105,9 +108,10 @@ module WinEncoding
         true,length(ss)
     end
     """
-    decode1252(a::Vector{UInt8})
+        decode1252(a::Vector{UInt8})
     Convert an array of bytes a representing text in encoding cp1252 to a string.
-    [0x8d] => '\\u8d' as windows api does;no invalid sequence error;non-blocking """
+    [0x8d] => '\\u8d' as windows api does;no invalid sequence error;non-blocking
+    """
     function decode1252(ss::Vector{UInt8}) 
         o=zeros(UInt8,length(ss)*3)
         is7bit,len = _7bit2(ss)
