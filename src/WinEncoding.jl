@@ -43,7 +43,7 @@ module WinEncoding
     fallback to '\ufffd';no invalid sequence error;non-blocking
     """
     function decode936(ss::Vector{UInt8}) 
-        blength=length(ss)   
+        blength=length(ss)
         o=similar(ss, blength*2+1)
         b=1
         skip1=false
@@ -70,7 +70,7 @@ module WinEncoding
     """
     function decode932(ss::Vector{UInt8}) 
         blength=length(ss)
-        o=zeros(UInt8,blength*2+1)
+        o=similar(ss, blength*2+1)
         b=1
         skip1=false
         @inbounds for (i, c) in enumerate(ss)
