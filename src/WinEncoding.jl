@@ -113,7 +113,7 @@ module WinEncoding
     [0x8d] => '\\u8d' as Windows API does;no invalid sequence error;non-blocking
     """
     function decode1252(ss::Vector{UInt8}) 
-        o=similar(ss, length(ss)*2+1)
+        o=similar(ss, length(ss)*3)
         is7bit,len = _7bit2(ss)
 #         o[1:len]=ss[1:len]
 #         unsafe_copyto!(o,1,ss,1,len)
