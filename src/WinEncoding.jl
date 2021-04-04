@@ -9,12 +9,13 @@ module WinEncoding
     const _xff=[0xef, 0xa3, 0xb8]      # '\uf8f8'
     const _xff_936=[0xef, 0xa3, 0xb5]      # '\uf8f5'
     const _invalid=[0xef, 0xbf, 0xbd]  # '�'
-    export decode1252
+    export decode1252, decode950
 
     """
         decode950(a::Vector{UInt8})
-    Convert an array of bytes a representing text in encoding cp950 to a string.
-    fallback to big5-hkscs or '\ufffd';no invalid sequence error;non-blocking
+    Convert an array of bytes `a` representing text in encoding cp950/big5 to a string.
+    - fallback to big5-hkscs or '\ufffd';no invalid sequence error
+    - non-blocking
     """
     function decode950(ss::Vector{UInt8}) 
         blength=length(ss)
@@ -39,8 +40,9 @@ module WinEncoding
     end
     """
         decode936(a::Vector{UInt8})
-    Convert an array of bytes a representing text in encoding cp936/gbk to a string.
-    fallback to '\ufffd';no invalid sequence error;non-blocking
+    Convert an array of bytes `a` representing text in encoding cp936/gbk to a string.
+    - fallback to '\ufffd';no invalid sequence error
+    - non-blocking
     """
     function decode936(ss::Vector{UInt8}) 
         blength=length(ss)
@@ -65,8 +67,9 @@ module WinEncoding
     end
     """
         decode932(a::Vector{UInt8})
-    Convert an array of bytes a representing text in encoding cp932/sjis to a string.
-    fallback to '・';no invalid sequence error;non-blocking
+    Convert an array of bytes `a` representing text in encoding cp932/sjis to a string.
+    - fallback to '・';no invalid sequence error
+    - non-blocking
     """
     function decode932(ss::Vector{UInt8}) 
         blength=length(ss)
@@ -109,8 +112,18 @@ module WinEncoding
     end
     """
         decode1252(a::Vector{UInt8})
-    Convert an array of bytes a representing text in encoding cp1252 to a string.
-    [0x8d] => '\\u8d' as Windows API does;no invalid sequence error;non-blocking
+    Convert an array of bytes `a` representing text in encoding cp1252/windows-1252 to a string.
+    - [0x8d] => '\\u8d' as Windows API does
+    - no invalid sequence error
+    - non-blocking
+    ## Examples
+    ```jldoctest
+    julia> decode1252([0x80])
+    "€"
+    
+    julia> decode1252([0xa9])
+    "©"
+    ```
     """
     function decode1252(ss::Vector{UInt8}) 
         o=Array{UInt8}(undef,length(ss)*3)
