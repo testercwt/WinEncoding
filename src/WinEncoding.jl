@@ -29,8 +29,8 @@ module WinEncoding
             i % 1_000_000 == 1 && yield()
             skip1=true
             hh=c-0x80
-            ll= ((i1=i+1) <= blength ) ? ss[i1] : 0x00
-            cc= (ll < 0x40 || ll==0xff || 0x7e<ll<0xa1) ? _invalid  : (ll-=0x3f;ll > 0x3f && (ll-=0x22);cp950[hh][ll])
+            ll=((i1=i+1) <= blength ) ? ss[i1] : 0x00
+            cc=(ll < 0x40 || ll==0xff || 0x7e<ll<0xa1) ? _invalid : (ll-=0x3f;ll > 0x3f && (ll-=0x22);cp950[hh][ll])
             ccl=length(cc)
             unsafe_copyto!(o,b,cc,1,ccl)
             b+=ccl
@@ -52,11 +52,11 @@ module WinEncoding
             c<0x80 && (o[b]=c; b+=1;continue)
             c==0x80 && (copyto!(o,b,_x80_936,1,3); b+=3;continue)
             c==0xff && (copyto!(o,b,_xff_936,1,3); b+=3;continue)
-            i % 1_000_000 == 1 && yield()
+            i % 1024*1024 == 0 && yield()
             skip1=true
             hh=c-0x80
-            ll= ((i1=i+1) <= blength ) ? ss[i1] : 0x00
-            cc= (ll < 0x40 || ll==0xff ) ? _invalid  : cp936[hh][ll-0x3f]
+            ll=((i1=i+1) <= blength) ? ss[i1] : 0x00
+            cc=(ll < 0x40 || ll==0xff) ? _invalid : cp936[hh][ll-0x3f]
             ccl=length(cc)
             unsafe_copyto!(o,b,cc,1,ccl)
             b+=ccl
@@ -73,7 +73,7 @@ module WinEncoding
         o=Array{UInt8}(undef,blength*2+1)
         b=1
         skip1=false
-        @inbounds for (i,c) in enumerate(ss)
+        @inbounds for (i, c) in enumerate(ss)
             skip1==true && (skip1=false;continue)
             c<0x80 && (o[b]=c; b+=1;continue)
             if (c == 0x80 || 0xa0 <= c <0xe0 || c > 0xef) 
@@ -81,12 +81,12 @@ module WinEncoding
                     copyto!(o,b,cc,1,ccl); b+=ccl;continue
                 end
             end
-            i % 1_000_000 == 1 && yield()
+            i % 1024*1024 == 0 && yield()
             skip1=true
             hh=c-0x80
             hh > 0x1f && (hh-=0x40)
-            ll= ((i1=i+1) <= blength ) ? ss[i1] : 0x00
-            cc= (ll < 0x40 || ll > 0xfc ) ? _invalid  : cp932[hh][ll-0x3f]
+            ll=((i1=i+1) <= blength) ? ss[i1] : 0x00
+            cc=(ll < 0x40 || ll > 0xfc) ? _invalid : cp932[hh][ll-0x3f]
             ccl=length(cc)
             unsafe_copyto!(o,b,cc,1,ccl)
             b+=ccl
@@ -110,7 +110,7 @@ module WinEncoding
     """
         decode1252(a::Vector{UInt8})
     Convert an array of bytes a representing text in encoding cp1252 to a string.
-    [0x8d] => '\\u8d' as windows api does;no invalid sequence error;non-blocking
+    [0x8d] => '\\u8d' as Windows API does;no invalid sequence error;non-blocking
     """
     function decode1252(ss::Vector{UInt8}) 
         o=Array{UInt8}(undef,length(ss)*3)
@@ -124,7 +124,7 @@ module WinEncoding
                 o[b]=c
                 b+=1
             else
-                b % 1_000_000 == 1 && yield()
+                b % 1024*1024 == 0 && yield()
                 cc=cp1252b[c+1]
                 ccl=length(cc)
                 unsafe_copyto!(o,b,cc,1,ccl)
