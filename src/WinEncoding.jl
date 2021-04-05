@@ -12,7 +12,7 @@ module WinEncoding
     export decode1252, decode950
     
     const decode950(a::Vector{UInt8})=Cp950.decode(a)
-    const decode950(f::String)= (@assert isfile(f) "Input must be a valid file name"; Cp950.decode(read(f)))
+    const decode950(f::String,type=Vector{UInt8})= (@assert isfile(f) "Input must be a valid file name"; Cp950.decode(read(f),type))
     const decode936(a)=Cp936.decode(a)
     const decode932(a)=Cp932.decode(a)
 
@@ -23,11 +23,11 @@ module WinEncoding
         const _xff=[0xef, 0xa3, 0xb8]      # '\uf8f8'
         """
             decode950(a::Vector{UInt8})
-        Convert an array of bytes `a` representing text in encoding cp950/big5 to a string.
+        Convert an array of bytes `a` representing text in encoding ***cp950/big5/hkscs*** to a string.
         - fallback to big5-hkscs or '\ufffd';no invalid sequence error
         - non-blocking
         """
-        function decode(ss::Vector{UInt8}) 
+        function decode(ss::Vector{UInt8},type=String) 
             blength=length(ss)
             o=Array{UInt8}(undef,blength*2+1)
             b=1
@@ -46,7 +46,7 @@ module WinEncoding
                 unsafe_copyto!(o,b,cc,1,ccl)
                 b+=ccl
             end
-            @view(o[1:b-1]) |> String
+            type===String ? String(@view(o[1:b-1])) : o[1:b-1]
         end
     end
 
@@ -59,7 +59,7 @@ module WinEncoding
 
         """
             decode936(a::Vector{UInt8})
-        Convert an array of bytes `a` representing text in encoding cp936/gbk to a string.
+        Convert an array of bytes `a` representing text in encoding ***cp936/gbk*** to a string.
         - fallback to '\ufffd';no invalid sequence error
         - non-blocking
         """
@@ -92,7 +92,7 @@ module WinEncoding
         const cp932b=include("cp932b.jl")
         """
             decode932(a::Vector{UInt8})
-        Convert an array of bytes `a` representing text in encoding cp932/sjis to a string.
+        Convert an array of bytes `a` representing text in encoding ***cp932/sjis*** to a string.
         - fallback to '・';no invalid sequence error
         - non-blocking
         """
@@ -139,7 +139,7 @@ module WinEncoding
     end
     """
         decode1252(a::Vector{UInt8})
-    Convert an array of bytes `a` representing text in encoding **cp1252/windows-1252** to a string.
+    Convert an array of bytes `a` representing text in encoding ***cp1252/windows-1252*** to a string.
     - [0x8d] => '\\u8d' as Windows API does
     - no invalid sequence error
     - non-blocking
