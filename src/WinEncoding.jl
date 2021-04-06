@@ -10,7 +10,16 @@ module WinEncoding
 #     const _xff_936=[0xef, 0xa3, 0xb5]      # '\uf8f5'
     const _invalid=[0xef, 0xbf, 0xbd]  # '�'
     export decode1252, decode950
-    
+
+    """
+        decode950(a::Vector{UInt8})
+    Convert an array of bytes `a` representing text in encoding ***cp950/big5/hkscs*** to a string.
+    - fallback to big5-hkscs or '\ufffd';no invalid sequence error
+    - non-blocking
+
+        decode950(f::Filename)
+    Convert file `f` content to Vector{UInt8} from cp950 to utf-8
+    """
     const decode950(a::Vector{UInt8})=Cp950.decode(a)
     const decode950(f::String,type=Vector{UInt8})= (@assert isfile(f) "Input must be a valid file name"; Cp950.decode(read(f),type))
     const decode936(a)=Cp936.decode(a)
@@ -21,12 +30,7 @@ module WinEncoding
         const cp950=include("cp950.jl")
         const _x80=[0xc2,0x80]             # '\u80'
         const _xff=[0xef, 0xa3, 0xb8]      # '\uf8f8'
-        """
-            decode950(a::Vector{UInt8})
-        Convert an array of bytes `a` representing text in encoding ***cp950/big5/hkscs*** to a string.
-        - fallback to big5-hkscs or '\ufffd';no invalid sequence error
-        - non-blocking
-        """
+
         function decode(ss::Vector{UInt8},type=String) 
             blength=length(ss)
             o=Array{UInt8}(undef,blength*2+1)
