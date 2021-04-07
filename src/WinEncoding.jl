@@ -13,12 +13,17 @@ module WinEncoding
 
     """
         decode950(a::Vector{UInt8})
-    Convert an array of bytes `a` representing text in encoding ***cp950/big5/hkscs*** to a string.
+    Convert an array of bytes `a` representing text in encoding `cp950/big5/hkscs` to a string.
     - fallback to big5-hkscs or '\ufffd';no invalid sequence error
     - non-blocking
 
         decode950(f::Filename)
     Convert file `f` content to Vector{UInt8} from cp950 to utf-8
+    ## Examples
+    ```jldoctest
+    julia> decode950([0xa4,0x48])
+    "人"
+    ```
     """
     const decode950(a::Vector{UInt8})=Cp950.decode(a)
     const decode950(f::String,type=Vector{UInt8})= (@assert isfile(f) "Input must be a valid file name"; Cp950.decode(read(f),type))
@@ -31,7 +36,7 @@ module WinEncoding
         const _x80=[0xc2,0x80]             # '\u80'
         const _xff=[0xef, 0xa3, 0xb8]      # '\uf8f8'
 
-        function decode(ss::Vector{UInt8},type=String) 
+        function decode(ss::Vector{UInt8},type::Type=String) 
             blength=length(ss)
             o=Array{UInt8}(undef,blength*2+1)
             b=1
@@ -143,7 +148,7 @@ module WinEncoding
     end
     """
         decode1252(a::Vector{UInt8})
-    Convert an array of bytes `a` representing text in encoding ***cp1252/windows-1252*** to a string.
+    Convert an array of bytes `a` representing text in encoding `cp1252/windows-1252` to a string.
     - [0x8d] => '\\u8d' as Windows API does
     - no invalid sequence error
     - non-blocking
@@ -154,9 +159,10 @@ module WinEncoding
     
     julia> decode1252([0xa9])
     "©"
+
     ```
     """
-    function decode1252(ss::Vector{UInt8}) 
+    function decode1252(ss::Vector{UInt8},type::Type=String) 
         o=Array{UInt8}(undef,length(ss)*3)
         is7bit,len = _7bit2(ss)
 #         o[1:len]=ss[1:len]
@@ -175,6 +181,10 @@ module WinEncoding
                 b+=ccl
             end
         end
-        view(o,1:b-1) |> String
+        type===String ? String(@view(o[1:b-1])) : o[1:b-1]
+    end
+    function decode1252(f::String,type=Vector{UInt8})
+        @assert isfile(f) "Input must be a valid file name"
+        decode1252(read(f),type)
     end
 end # module
