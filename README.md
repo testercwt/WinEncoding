@@ -27,8 +27,9 @@ Convert an array of bytes `a` representing text in encoding ***cp950/big5/hkscs*
 ```julia
 julia> decode950([0xa4,0x48])
 "人"
----
+```
 
+---
 
 # Q&A
 ## Why decoding with this package instead of lib_iconv based package?
