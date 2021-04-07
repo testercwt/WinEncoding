@@ -9,6 +9,13 @@ let
         @test decode1252([0x33,0x34,0x35])=="345"
         @test decode1252([0xa2,0xe7])=="¢ç"
     end
+
+    @testset "codepage 1252 decode/encode" begin
+        for c in 0x0:0xff
+            @test WinEncoding.encode1252(decode1252([c])) == [c]
+        end
+    end
+
     @testset "codepage 950" begin
         @test WinEncoding.decode950([0xa4,0x48])=="人"
         @test WinEncoding.decode950([0xa4])=="�" #"\ufffd"

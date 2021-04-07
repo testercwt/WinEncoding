@@ -8,7 +8,9 @@ Convert an array of bytes `a` representing text in encoding ***cp1252/windows-12
 - [0x8d] => '\\u8d' as Windows API does
 - no invalid sequence error
 - non-blocking
+
 ## Examples
+
 ```julia
 julia> decode1252([0x80])
 "€"
@@ -24,6 +26,7 @@ Convert an array of bytes `a` representing text in encoding ***cp950/big5/hkscs*
 - non-blocking
 
 ## Examples
+
 ```julia
 julia> decode950([0xa4,0x48])
 "人"
