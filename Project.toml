@@ -1,6 +1,6 @@
 name = "WinEncoding"
 uuid = "e55f5955-59f4-4493-8aaa-7731398b7a54"
 authors = ["testercwt <67111993+testercwt@users.noreply.github.com>"]
-version = "0.1.1"
+version = "0.1.2"
 [compat]
 julia = "1.0"
