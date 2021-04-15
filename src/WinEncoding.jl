@@ -18,7 +18,7 @@ module WinEncoding
     - non-blocking
 
         decode950(f::Filename)
-    Convert file `f` content to Vector{UInt8} from cp950 to utf-8
+    Convert file `f` content to Vector{UInt8} from cp950 to utf-8 Vector{UInt8}
     ## Examples
     ```jldoctest
     julia> decode950([0xa4,0x48])
@@ -26,7 +26,17 @@ module WinEncoding
     ```
     """
     const decode950(a::Vector{UInt8})=Cp950.decode(a)
-    const decode950(f::String,type=Vector{UInt8})= (@assert isfile(f) "Input must be a valid file name"; Cp950.decode(read(f),type))
+    function decode950(f::String,type=Vector{UInt8})
+        @assert isfile(f) "Input must be a valid file name"
+        bom=read(f,3)
+        if bom == [0xef,0xbb,0xbf] 
+            read(f)
+        elseif length(bom) >= 2 && bom[1:2]==[0xff,0xfe]
+            transcode(UInt8,reinterpret(read(f),UInt16))
+        else
+            Cp950.decode(read(f),type)
+        end
+    end
     const decode936(a)=Cp936.decode(a)
     const decode932(a)=Cp932.decode(a)
 
