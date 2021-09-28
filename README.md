@@ -44,7 +44,7 @@ Or simplily remove it because iconv based package will install one if not found
 - it blocked the coroutine and this is bad in some application such as web service
 - it is not 100% compatible with Windows API result. For example,in cp1252/windows-1252 [0x8d] throw error while it is supposed to be 'u8d'. Many web pages in latin-1 charset is actually encoded with codepage 1252 instead of latin-1. And in unknown charset , it should fallback to codepage 1252 as well.
 
-## Why does decode950  do?
+## What does decode950  do?
 Cp950 is popular and ususally the default charset of traditional Han character in east asia/taiwan. However , the iconv support is limited. Cp950 and hkscs were superset of big5 but hkscs was not compatible with cp950.
 - older version iconv cannot decode big5-hkscs. And several web page in charset of big5 was actually encoded with big5-hkscs 
 - many web page in charset of big5 was actually encoded with cp950
