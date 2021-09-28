@@ -27,11 +27,13 @@ module WinEncoding
     """
     const decode950(a::Vector{UInt8})=Cp950.decode(a)
     function decode950(f::String,type=Vector{UInt8})
-        @assert isfile(f) "Input must be a valid file name"
+        @assert isfile(f) "$f must be a valid file name"
         bom=read(f,3)
         if bom == [0xef,0xbb,0xbf] 
+            @info "Detect utf-8 bom(byte order mark) ; just read"
             read(f)
         elseif length(bom) >= 2 && bom[1:2]==[0xff,0xfe]
+            @info "Detect UTF-16LE bom ; using built-in transcode"
             transcode(UInt8,reinterpret(read(f),UInt16))
         else
             Cp950.decode(read(f),type)
